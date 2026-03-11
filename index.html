@@ -46,3 +46,119 @@
     </style>
 </head>
 <body>
+
+    <div class="container">
+        <div class="card">
+            <h1>✨ Hoy agradezco por...</h1>
+            <input type="text" id="grat1" placeholder="Primera cosa...">
+            <input type="text" id="grat2" placeholder="Segunda cosa...">
+            <input type="text" id="grat3" placeholder="Tercera cosa...">
+            <button onclick="saveGratitude()">Guardar en mi Diario</button>
+            
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 25px 0;">
+            
+            <label>Configurar Recordatorio Infalible:</label>
+            <input type="time" id="reminderTime">
+            <button class="btn-alarm" onclick="crearAlarmaCalendario()">
+               ⏰ Programar Aviso Diario
+            </button>
+            <p style="font-size: 0.75rem; color: #888; text-align: center; margin-top: 10px;">
+                Esto creará un evento en tu calendario que sonará todos los días.
+            </p>
+        </div>
+
+        <div class="history-section" id="history"></div>
+    </div>
+
+    <script>
+        // Cargar historial al iniciar
+        window.addEventListener('load', () => {
+            displayHistory();
+            const savedTime = localStorage.getItem('reminderTime');
+            if(savedTime) document.getElementById('reminderTime').value = savedTime;
+        });
+
+        function saveGratitude() {
+            const g1 = document.getElementById('grat1').value.trim();
+            const g2 = document.getElementById('grat2').value.trim();
+            const g3 = document.getElementById('grat3').value.trim();
+            
+            if(!g1 || !g2 || !g3) return alert("Escribe tus 3 agradecimientos.");
+
+            const entry = {
+                date: new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }),
+                phrases: [g1, g2, g3]
+            };
+
+            let history = JSON.parse(localStorage.getItem('gratitudeHistory') || '[]');
+            history.unshift(entry);
+            localStorage.setItem('gratitudeHistory', JSON.stringify(history));
+            
+            document.getElementById('grat1').value = '';
+            document.getElementById('grat2').value = '';
+            document.getElementById('grat3').value = '';
+
+            displayHistory();
+            alert("🙏 ¡Guardado!");
+        }
+
+        function displayHistory() {
+            const container = document.getElementById('history');
+            const history = JSON.parse(localStorage.getItem('gratitudeHistory') || '[]');
+            
+            if(history.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#999;">Tu diario está vacío aún.</p>';
+                return;
+            }
+
+            container.innerHTML = '<h3>Historial</h3>' + history.map(e => `
+                <div class="entry">
+                    <span class="entry-date">${e.date}</span>
+                    <span class="phrase">1. ${e.phrases[0]}</span>
+                    <span class="phrase">2. ${e.phrases[1]}</span>
+                    <span class="phrase">3. ${e.phrases[2]}</span>
+                </div>
+            `).join('');
+        }
+
+        function crearAlarmaCalendario() {
+            const time = document.getElementById('reminderTime').value;
+            if(!time) return alert("Por favor, elige una hora primero.");
+            
+            localStorage.setItem('reminderTime', time);
+            const [h, m] = time.split(':');
+            
+            // Generar archivo de calendario (.ics)
+            const titulo = "Momento de Gratitud 🙏";
+            const linkApp = window.location.href;
+            const desc = "Haz clic aquí para escribir tus 3 agradecimientos: " + linkApp;
+            
+            const icsData = [
+                "BEGIN:VCALENDAR",
+                "VERSION:2.0",
+                "BEGIN:VEVENT",
+                "RRULE:FREQ=DAILY",
+                "DTSTART:" + new Date().toISOString().split('T')[0].replace(/-/g, '') + "T" + h + m + "00",
+                "SUMMARY:" + titulo,
+                "DESCRIPTION:" + desc,
+                "BEGIN:VALARM",
+                "TRIGGER:-PT0M",
+                "ACTION:DISPLAY",
+                "DESCRIPTION:Reminder",
+                "END:VALARM",
+                "END:VEVENT",
+                "END:VCALENDAR"
+            ].join("\n");
+
+            const blob = new Blob([icsData], { type: 'text/calendar;charset=utf-8' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'recordatorio_gratitud.ics';
+            a.click();
+            
+            alert("Se descargará un archivo de calendario. Ábrelo y selecciona 'Añadir todo' o 'Guardar' para activar tu aviso diario.");
+        }
+    </script>
+</body>
+</html>
