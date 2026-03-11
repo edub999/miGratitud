@@ -3,164 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gratitud Diaria</title>
+    <title>Mi Gratitud Diaria</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#4a7c59">
     
     <style>
-        :root { --primary: #4a7c59; --bg: #f8f9fa; }
+        :root { --primary: #4a7c59; --bg: #f0f4f8; }
         body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            font-family: -apple-system, system-ui, sans-serif; 
             background: var(--bg); margin: 0; padding: 20px; color: #333;
         }
         .container { max-width: 450px; margin: 0 auto; }
         .card { 
             background: white; padding: 25px; border-radius: 24px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08); margin-bottom: 25px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06); margin-bottom: 20px;
         }
-        h1 { color: var(--primary); text-align: center; font-size: 1.6rem; margin: 0 0 20px 0; }
-        label { display: block; font-size: 0.85rem; color: #777; margin-bottom: 5px; margin-left: 5px; }
+        h1 { color: var(--primary); text-align: center; font-size: 1.5rem; margin-top: 0; }
         
         input[type="text"], input[type="time"] { 
-            width: 100%; padding: 14px; margin-bottom: 12px; border: 1px solid #eee; 
-            border-radius: 12px; box-sizing: border-box; font-size: 16px; background: #fafafa;
+            width: 100%; padding: 14px; margin-bottom: 12px; border: 1px solid #ddd; 
+            border-radius: 12px; box-sizing: border-box; font-size: 16px;
         }
-        input:focus { outline: none; border-color: var(--primary); background: #fff; }
 
         button { 
             width: 100%; padding: 16px; background: var(--primary); color: white; 
             border: none; border-radius: 12px; cursor: pointer; font-size: 16px; 
-            font-weight: 600; margin-top: 5px; transition: transform 0.1s;
+            font-weight: bold; margin-top: 5px;
         }
-        button:active { transform: scale(0.98); opacity: 0.9; }
-        .btn-secondary { background: #6c757d; margin-top: 15px; padding: 10px; font-size: 14px; }
-
-        .history-title { font-weight: bold; color: var(--primary); margin: 20px 0 10px 5px; display: block; }
+        .btn-alarm { 
+            background: #fff; color: #444; border: 2px solid #ddd; margin-top: 15px;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        
+        .history-section { margin-top: 20px; }
         .entry { 
-            background: white; padding: 18px; margin-bottom: 15px; border-radius: 18px; 
-            border-left: 6px solid var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            background: white; padding: 15px; margin-bottom: 12px; border-radius: 15px; 
+            border-left: 5px solid var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.03);
         }
-        .entry-date { font-size: 0.75rem; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: block; }
-        .phrase { display: block; margin-bottom: 4px; font-size: 1rem; line-height: 1.4; }
-        hr { border: 0; border-top: 1px solid #eee; margin: 25px 0; }
+        .entry-date { font-size: 0.8rem; color: #888; font-weight: bold; }
+        .phrase { display: block; margin-top: 4px; font-size: 0.95rem; }
+        label { display: block; margin-bottom: 6px; font-size: 0.9rem; color: #666; font-weight: 500; }
     </style>
 </head>
 <body>
-
-    <div class="container">
-        <div class="card">
-            <h1>✨ Mi Gratitud</h1>
-            
-            <input type="text" id="grat1" placeholder="Hoy agradezco por...">
-            <input type="text" id="grat2" placeholder="También por...">
-            <input type="text" id="grat3" placeholder="Y finalmente por...">
-            
-            <button onclick="saveGratitude()">Guardar Hoy</button>
-            
-            <hr>
-            <label>Hora del recordatorio:</label>
-            <input type="time" id="reminderTime">
-            <button class="btn-secondary" onclick="setReminder()">Fijar Notificación</button>
-        </div>
-
-        <span class="history-title">TU DIARIO</span>
-        <div id="history">
-            </div>
-    </div>
-
-    <script>
-        // Función para mostrar el historial (La definimos primero para usarla siempre)
-        function displayHistory() {
-            const container = document.getElementById('history');
-            const history = JSON.parse(localStorage.getItem('gratitudeHistory') || '[]');
-            
-            if(history.length === 0) {
-                container.innerHTML = '<p style="text-align:center; color:#bbb; margin-top:20px;">Tu diario está vacío.<br>Escribe algo arriba.</p>';
-                return;
-            }
-
-            container.innerHTML = history.map(e => `
-                <div class="entry">
-                    <span class="entry-date">${e.date}</span>
-                    <span class="phrase"><b>1.</b> ${e.phrases[0]}</span>
-                    <span class="phrase"><b>2.</b> ${e.phrases[1]}</span>
-                    <span class="phrase"><b>3.</b> ${e.phrases[2]}</span>
-                </div>
-            `).join('');
-        }
-
-        // Función para guardar
-        function saveGratitude() {
-            const g1 = document.getElementById('grat1').value.trim();
-            const g2 = document.getElementById('grat2').value.trim();
-            const g3 = document.getElementById('grat3').value.trim();
-            
-            if(!g1 || !g2 || !g3) {
-                alert("Escribe las 3 cosas antes de guardar.");
-                return;
-            }
-
-            const now = new Date();
-            const entry = {
-                date: now.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'short' }),
-                phrases: [g1, g2, g3],
-                timestamp: now.getTime()
-            };
-
-            let history = JSON.parse(localStorage.getItem('gratitudeHistory') || '[]');
-            history.unshift(entry); // Agregar al inicio
-            
-            // Guardar en la memoria del celular
-            localStorage.setItem('gratitudeHistory', JSON.stringify(history));
-            
-            // Limpiar los cuadritos
-            document.getElementById('grat1').value = '';
-            document.getElementById('grat2').value = '';
-            document.getElementById('grat3').value = '';
-
-            // Actualizar la lista visualmente de inmediato
-            displayHistory();
-            alert("¡Guardado en tu diario!");
-        }
-
-        function setReminder() {
-            const time = document.getElementById('reminderTime').value;
-            if(!time) return alert("Elige una hora primero");
-            localStorage.setItem('reminderTime', time);
-            
-            if (Notification.permission !== "granted") {
-                Notification.requestPermission();
-            }
-            alert("Recordatorio configurado a las " + time);
-        }
-
-        // Sistema de notificaciones
-        setInterval(() => {
-            const now = new Date();
-            const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-            if(currentTime === localStorage.getItem('reminderTime')) {
-                if (Notification.permission === "granted") {
-                    new Notification("🙏 Momento de agradecer", { 
-                        body: "Entra a tu app y escribe tus 3 frases de hoy.",
-                        icon: "https://cdn-icons-png.flaticon.com/512/2904/2904979.png"
-                    });
-                }
-            }
-        }, 60000);
-
-        // Al cargar la página por primera vez
-        window.addEventListener('load', () => {
-            displayHistory();
-            
-            // Cargar hora guardada si existe
-            const savedTime = localStorage.getItem('reminderTime');
-            if(savedTime) document.getElementById('reminderTime').value = savedTime;
-
-            // Registrar Service Worker
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('sw.js').catch(err => console.log(err));
-            }
-        });
-    </script>
-</body>
-</html>
