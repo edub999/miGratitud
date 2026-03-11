@@ -1,32 +1,23 @@
-const CACHE_NAME = 'gratitud-v1';
-const assets = [
-  './',
-  './index.html',
-  './manifest.json'
-];
+const CACHE_NAME = 'gratitud-v2';
 
-// Instalar y guardar archivos en caché
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(assets);
-    })
-  );
+// Instalación
+self.addEventListener('install', (event) => {
+  self.skipWaiting();
 });
 
-// Responder desde la caché cuando no hay internet
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request).then(response => {
-      return response || fetch(event.request);
-    })
-  );
+// Activación
+self.addEventListener('activate', (event) => {
+  event.waitUntil(clients.claim());
 });
 
-// Escuchar eventos de notificación (opcional para expansión futura)
-self.addEventListener('notificationclick', event => {
-  event.notification.close();
+// Escuchar mensajes del sistema (Opcional para el futuro)
+self.addEventListener('push', (event) => {
+  const options = {
+    body: 'Es momento de agradecer por 3 cosas.',
+    icon: 'https://cdn-icons-png.flaticon.com/512/2904/2904979.png',
+    badge: 'https://cdn-icons-png.flaticon.com/512/2904/2904979.png'
+  };
   event.waitUntil(
-    clients.openWindow('/')
+    self.registration.showNotification('🙏 Gratitud Diaria', options)
   );
 });
