@@ -1,0 +1,15 @@
+{
+  "name": "Gratitud Diaria",
+  "short_name": "Gratitud",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#f0f4f8",
+  "theme_color": "#4a7c59",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2904/2904979.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

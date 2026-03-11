@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Gratitud Diaria</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4a7c59">
+    
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: #f0f4f8; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 20px;
+            margin: 0;
+        }
+        .card { 
+            background: white; 
+            padding: 25px; 
+            border-radius: 20px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
+            width: 100%; 
+            max-width: 400px; 
+            margin-top: 20px;
+        }
+        h1 { color: #4a7c59; text-align: center; font-size: 1.5rem; margin-bottom: 20px; }
+        p { color: #666; font-size: 0.9rem; margin-bottom: 5px; }
+        input[type="text"], input[type="time"] { 
+            width: 100%; 
+            padding: 12px; 
+            margin: 8px 0; 
+            border: 1px solid #e0e0e0; 
+            border-radius: 10px; 
+            box-sizing: border-box;
+            font-size: 16px; /* Evita zoom automático en iPhone */
+        }
+        button { 
+            width: 100%; 
+            padding: 14px; 
+            background: #4a7c59; 
+            color: white; 
+            border: none; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            font-weight: bold;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+        button:active { background: #3d664a; }
+        .history { margin-top: 30px; width: 100%; max-width: 400px; }
+        .entry { 
+            background: #fff; 
+            padding: 15px; 
+            margin-bottom: 12px; 
+            border-radius: 12px; 
+            border-left: 6px solid #4a7c59;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+        }
+        .entry strong { color: #4a7c59; display: block; margin-bottom: 5px; }
+        hr { border: 0; border-top: 1px solid #eee; margin: 20px 0; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h1>✨ Hoy agradezco por...</h1>
+        <input type="text" id="grat1" placeholder="1. Escribe aquí...">
+        <input type="text" id="grat2" placeholder="2. Escribe aquí...">
+        <input type="text" id="grat3" placeholder="3. Escribe aquí...">
+        <button onclick="saveGratitude()">Guardar Gratitud</button>
+        
+        <hr>
+        <p>Configurar Recordatorio Diario:</p>
+        <input type="time" id="reminderTime">
+        <button style="background: #6c757d;" onclick="setReminder()">Fijar Horario</button>
+    </div>
+
+    <div class="history" id="history">
+        </div>
+
+    <script>
+        // --- LÓGICA DE LA APP ---
+
+        // Función para guardar frases en LocalStorage
+        function saveGratitude() {
+            const g1 = document.getElementById('grat1').value;
+            const g2 = document.getElementById('grat2').value;
+            const g3 = document.getElementById('grat3').value;
+            
+            if(!g1 || !g2 || !g3) {
+                alert("Por favor, completa los tres campos.");
+                return;
+            }
+
+            const entry = {
+                date: new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+                phrases: [g1, g2, g3]
+            };
+
+            let history = JSON.parse(localStorage.getItem('gratitudeHistory') || '[]');
+            history.unshift(entry);
+            localStorage.setItem('gratitudeHistory', JSON.stringify(history));
+            
+            // Limpiar inputs
+            document.getElementById('grat1').value = '';
+            document.getElementById('grat2').value = '';
+            document.getElementById('grat3').value = '';
+
+            alert("¡Guardado con éxito! 🙏");
+            displayHistory();
+        }
+
+        // Función para mostrar el historial guardado
+        function displayHistory() {
+            const container = document.getElementById('history');
+            const history = JSON.parse(localStorage.getItem('gratitudeHistory') || '[]');
+            
+            if(history.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#999;">Aún no tienes registros.</p>';
+                return;
+            }
+
+            container.innerHTML = '<h3 style="color:#4a7c59;">Historial</h3>' + history.map(e => `
+                <div class="entry">
+                    <strong>${e.date}</strong>
+                    1. ${e.phrases[0]}<br>
+                    2. ${e.phrases[1]}<br>
+                    3. ${e.phrases[2]}
+                </div>
+            `).join('');
+        }
+
+        // Configurar el horario del recordatorio
+        function setReminder() {
+            const time = document.getElementById('reminderTime').value;
+            if(!time) return alert("Elige una hora primero");
+            
+            localStorage.setItem('reminderTime', time);
+            alert(`¡Listo! Te recordaré agradecer a las ${time}.`);
+            
+            // Solicitar permiso si no se tiene
+            if (Notification.permission !== "granted") {
+                Notification.requestPermission();
+            }
+        }
+
+        // Revisar la hora cada minuto para disparar la notificación
+        setInterval(() => {
+            const now = new Date();
+            const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            const savedTime = localStorage.getItem('reminderTime');
+
+            if(currentTime === savedTime) {
+                if (Notification.permission === "granted") {
+                    new Notification("🙏 Momento de Gratitud", { 
+                        body: "Tómate un minuto para agradecer por 3 cosas hoy.",
+                        icon: "https://cdn-icons-png.flaticon.com/512/2904/2904979.png"
+                    });
+                }
+            }
+        }, 60000);
+
+        // --- LÓGICA DE PWA Y CARGA INICIAL ---
+
+        // 1. Registrar el Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log("SW registrado", reg))
+                .catch(err => console.log("SW falló", err));
+            });
+        }
+
+        // 2. Pedir permiso de notificaciones al abrir por primera vez
+        window.addEventListener('DOMContentLoaded', () => {
+            displayHistory();
+            if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+                Notification.requestPermission
