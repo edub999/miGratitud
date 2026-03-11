@@ -2,181 +2,165 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Gratitud Diaria</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gratitud Diaria</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#4a7c59">
     
     <style>
+        :root { --primary: #4a7c59; --bg: #f8f9fa; }
         body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background: #f0f4f8; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            padding: 20px;
-            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background: var(--bg); margin: 0; padding: 20px; color: #333;
         }
+        .container { max-width: 450px; margin: 0 auto; }
         .card { 
-            background: white; 
-            padding: 25px; 
-            border-radius: 20px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
-            width: 100%; 
-            max-width: 400px; 
-            margin-top: 20px;
+            background: white; padding: 25px; border-radius: 24px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08); margin-bottom: 25px;
         }
-        h1 { color: #4a7c59; text-align: center; font-size: 1.5rem; margin-bottom: 20px; }
-        p { color: #666; font-size: 0.9rem; margin-bottom: 5px; }
+        h1 { color: var(--primary); text-align: center; font-size: 1.6rem; margin: 0 0 20px 0; }
+        label { display: block; font-size: 0.85rem; color: #777; margin-bottom: 5px; margin-left: 5px; }
+        
         input[type="text"], input[type="time"] { 
-            width: 100%; 
-            padding: 12px; 
-            margin: 8px 0; 
-            border: 1px solid #e0e0e0; 
-            border-radius: 10px; 
-            box-sizing: border-box;
-            font-size: 16px; /* Evita zoom automático en iPhone */
+            width: 100%; padding: 14px; margin-bottom: 12px; border: 1px solid #eee; 
+            border-radius: 12px; box-sizing: border-box; font-size: 16px; background: #fafafa;
         }
+        input:focus { outline: none; border-color: var(--primary); background: #fff; }
+
         button { 
-            width: 100%; 
-            padding: 14px; 
-            background: #4a7c59; 
-            color: white; 
-            border: none; 
-            border-radius: 10px; 
-            cursor: pointer; 
-            font-size: 16px; 
-            font-weight: bold;
-            margin-top: 10px;
-            transition: background 0.3s;
+            width: 100%; padding: 16px; background: var(--primary); color: white; 
+            border: none; border-radius: 12px; cursor: pointer; font-size: 16px; 
+            font-weight: 600; margin-top: 5px; transition: transform 0.1s;
         }
-        button:active { background: #3d664a; }
-        .history { margin-top: 30px; width: 100%; max-width: 400px; }
+        button:active { transform: scale(0.98); opacity: 0.9; }
+        .btn-secondary { background: #6c757d; margin-top: 15px; padding: 10px; font-size: 14px; }
+
+        .history-title { font-weight: bold; color: var(--primary); margin: 20px 0 10px 5px; display: block; }
         .entry { 
-            background: #fff; 
-            padding: 15px; 
-            margin-bottom: 12px; 
-            border-radius: 12px; 
-            border-left: 6px solid #4a7c59;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+            background: white; padding: 18px; margin-bottom: 15px; border-radius: 18px; 
+            border-left: 6px solid var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.03);
         }
-        .entry strong { color: #4a7c59; display: block; margin-bottom: 5px; }
-        hr { border: 0; border-top: 1px solid #eee; margin: 20px 0; }
+        .entry-date { font-size: 0.75rem; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: block; }
+        .phrase { display: block; margin-bottom: 4px; font-size: 1rem; line-height: 1.4; }
+        hr { border: 0; border-top: 1px solid #eee; margin: 25px 0; }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h1>✨ Hoy agradezco por...</h1>
-        <input type="text" id="grat1" placeholder="1. Escribe aquí...">
-        <input type="text" id="grat2" placeholder="2. Escribe aquí...">
-        <input type="text" id="grat3" placeholder="3. Escribe aquí...">
-        <button onclick="saveGratitude()">Guardar Gratitud</button>
-        
-        <hr>
-        <p>Configurar Recordatorio Diario:</p>
-        <input type="time" id="reminderTime">
-        <button style="background: #6c757d;" onclick="setReminder()">Fijar Horario</button>
-    </div>
-
-    <div class="history" id="history">
+    <div class="container">
+        <div class="card">
+            <h1>✨ Mi Gratitud</h1>
+            
+            <input type="text" id="grat1" placeholder="Hoy agradezco por...">
+            <input type="text" id="grat2" placeholder="También por...">
+            <input type="text" id="grat3" placeholder="Y finalmente por...">
+            
+            <button onclick="saveGratitude()">Guardar Hoy</button>
+            
+            <hr>
+            <label>Hora del recordatorio:</label>
+            <input type="time" id="reminderTime">
+            <button class="btn-secondary" onclick="setReminder()">Fijar Notificación</button>
         </div>
 
+        <span class="history-title">TU DIARIO</span>
+        <div id="history">
+            </div>
+    </div>
+
     <script>
-        // --- LÓGICA DE LA APP ---
-
-        // Función para guardar frases en LocalStorage
-        function saveGratitude() {
-            const g1 = document.getElementById('grat1').value;
-            const g2 = document.getElementById('grat2').value;
-            const g3 = document.getElementById('grat3').value;
-            
-            if(!g1 || !g2 || !g3) {
-                alert("Por favor, completa los tres campos.");
-                return;
-            }
-
-            const entry = {
-                date: new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
-                phrases: [g1, g2, g3]
-            };
-
-            let history = JSON.parse(localStorage.getItem('gratitudeHistory') || '[]');
-            history.unshift(entry);
-            localStorage.setItem('gratitudeHistory', JSON.stringify(history));
-            
-            // Limpiar inputs
-            document.getElementById('grat1').value = '';
-            document.getElementById('grat2').value = '';
-            document.getElementById('grat3').value = '';
-
-            alert("¡Guardado con éxito! 🙏");
-            displayHistory();
-        }
-
-        // Función para mostrar el historial guardado
+        // Función para mostrar el historial (La definimos primero para usarla siempre)
         function displayHistory() {
             const container = document.getElementById('history');
             const history = JSON.parse(localStorage.getItem('gratitudeHistory') || '[]');
             
             if(history.length === 0) {
-                container.innerHTML = '<p style="text-align:center; color:#999;">Aún no tienes registros.</p>';
+                container.innerHTML = '<p style="text-align:center; color:#bbb; margin-top:20px;">Tu diario está vacío.<br>Escribe algo arriba.</p>';
                 return;
             }
 
-            container.innerHTML = '<h3 style="color:#4a7c59;">Historial</h3>' + history.map(e => `
+            container.innerHTML = history.map(e => `
                 <div class="entry">
-                    <strong>${e.date}</strong>
-                    1. ${e.phrases[0]}<br>
-                    2. ${e.phrases[1]}<br>
-                    3. ${e.phrases[2]}
+                    <span class="entry-date">${e.date}</span>
+                    <span class="phrase"><b>1.</b> ${e.phrases[0]}</span>
+                    <span class="phrase"><b>2.</b> ${e.phrases[1]}</span>
+                    <span class="phrase"><b>3.</b> ${e.phrases[2]}</span>
                 </div>
             `).join('');
         }
 
-        // Configurar el horario del recordatorio
+        // Función para guardar
+        function saveGratitude() {
+            const g1 = document.getElementById('grat1').value.trim();
+            const g2 = document.getElementById('grat2').value.trim();
+            const g3 = document.getElementById('grat3').value.trim();
+            
+            if(!g1 || !g2 || !g3) {
+                alert("Escribe las 3 cosas antes de guardar.");
+                return;
+            }
+
+            const now = new Date();
+            const entry = {
+                date: now.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'short' }),
+                phrases: [g1, g2, g3],
+                timestamp: now.getTime()
+            };
+
+            let history = JSON.parse(localStorage.getItem('gratitudeHistory') || '[]');
+            history.unshift(entry); // Agregar al inicio
+            
+            // Guardar en la memoria del celular
+            localStorage.setItem('gratitudeHistory', JSON.stringify(history));
+            
+            // Limpiar los cuadritos
+            document.getElementById('grat1').value = '';
+            document.getElementById('grat2').value = '';
+            document.getElementById('grat3').value = '';
+
+            // Actualizar la lista visualmente de inmediato
+            displayHistory();
+            alert("¡Guardado en tu diario!");
+        }
+
         function setReminder() {
             const time = document.getElementById('reminderTime').value;
             if(!time) return alert("Elige una hora primero");
-            
             localStorage.setItem('reminderTime', time);
-            alert(`¡Listo! Te recordaré agradecer a las ${time}.`);
             
-            // Solicitar permiso si no se tiene
             if (Notification.permission !== "granted") {
                 Notification.requestPermission();
             }
+            alert("Recordatorio configurado a las " + time);
         }
 
-        // Revisar la hora cada minuto para disparar la notificación
+        // Sistema de notificaciones
         setInterval(() => {
             const now = new Date();
             const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-            const savedTime = localStorage.getItem('reminderTime');
-
-            if(currentTime === savedTime) {
+            if(currentTime === localStorage.getItem('reminderTime')) {
                 if (Notification.permission === "granted") {
-                    new Notification("🙏 Momento de Gratitud", { 
-                        body: "Tómate un minuto para agradecer por 3 cosas hoy.",
+                    new Notification("🙏 Momento de agradecer", { 
+                        body: "Entra a tu app y escribe tus 3 frases de hoy.",
                         icon: "https://cdn-icons-png.flaticon.com/512/2904/2904979.png"
                     });
                 }
             }
         }, 60000);
 
-        // --- LÓGICA DE PWA Y CARGA INICIAL ---
-
-        // 1. Registrar el Service Worker
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                .then(reg => console.log("SW registrado", reg))
-                .catch(err => console.log("SW falló", err));
-            });
-        }
-
-        // 2. Pedir permiso de notificaciones al abrir por primera vez
-        window.addEventListener('DOMContentLoaded', () => {
+        // Al cargar la página por primera vez
+        window.addEventListener('load', () => {
             displayHistory();
-            if (Notification.permission !== "granted" && Notification.permission !== "denied") {
-                Notification.requestPermission
+            
+            // Cargar hora guardada si existe
+            const savedTime = localStorage.getItem('reminderTime');
+            if(savedTime) document.getElementById('reminderTime').value = savedTime;
+
+            // Registrar Service Worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('sw.js').catch(err => console.log(err));
+            }
+        });
+    </script>
+</body>
+</html>
